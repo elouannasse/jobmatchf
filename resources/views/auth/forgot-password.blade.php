@@ -37,7 +37,7 @@
 
                         <x-auth-session-status class="mb-4" :status="session('status')"/>
 
-                        <form class="js-validation-reminder" action="{{ route('password.email') }}" method="POST">
+                        <form class="js-validation-reminder" action="{{ route('manual.password.email') }}" method="POST">
                             @csrf
                             <div class="mb-4">
                                 <div class="input-group input-group-lg">
@@ -53,6 +53,11 @@
                                 <button type="submit" class="btn btn-hero btn-primary">
                                     <i class="fa fa-fw fa-reply opacity-50 me-1"></i> Reset Link Password
                                 </button>
+                            </div>
+                            <div class="text-center">
+                                <a href="{{ route('manual.login') }}" class="btn btn-sm btn-alt-secondary">
+                                    <i class="fa fa-fw fa-sign-in-alt opacity-50 me-1"></i> Retour à la connexion
+                                </a>
                             </div>
                         </form>
                         <!-- END Reminder Form -->

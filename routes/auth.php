@@ -11,49 +11,27 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
+// Routes d'authentification manuelle
 Route::middleware('guest')->group(function () {
-    Route::get('register', [RegisteredUserController::class, 'create'])
-        ->name('register');
-
-    Route::post('register', [RegisteredUserController::class, 'store']);
-
-    Route::get('login', [AuthenticatedSessionController::class, 'create'])
-        ->name('login');
-
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
-
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
-        ->name('password.request');
-
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
-        ->name('password.email');
-
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-        ->name('password.reset');
-
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
-        ->name('password.store');
+    // Login
+    Route::get('/login', [App\Http\Controllers\Auth\ManualAuthController::class, 'showLoginForm'])
+        ->name('manual.login');
+    Route::post('/login', [App\Http\Controllers\Auth\ManualAuthController::class, 'login']);
+    
+    // Register
+    Route::get('/register', [App\Http\Controllers\Auth\ManualAuthController::class, 'showRegisterForm'])
+        ->name('manual.register');
+    Route::post('/register', [App\Http\Controllers\Auth\ManualAuthController::class, 'register']);
+    
+    // Mot de passe oublié
+    Route::get('/forgot-password', [App\Http\Controllers\Auth\ManualAuthController::class, 'showForgotPasswordForm'])
+        ->name('manual.password.request');
+    Route::post('/forgot-password', [App\Http\Controllers\Auth\ManualAuthController::class, 'sendResetLinkEmail'])
+        ->name('manual.password.email');
 });
 
+// Route de déconnexion (accessible uniquement aux utilisateurs authentifiés)
 Route::middleware('auth')->group(function () {
-    Route::get('verify-email', EmailVerificationPromptController::class)
-        ->name('verification.notice');
-
-    Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
-
-    Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-        ->middleware('throttle:6,1')
-        ->name('verification.send');
-
-    Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
-        ->name('password.confirm');
-
-    Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
-
-    Route::put('password', [PasswordController::class, 'update'])->name('password.update');
-
-    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
-        ->name('logout');
+    Route::post('/logout', [App\Http\Controllers\Auth\ManualAuthController::class, 'logout'])
+        ->name('manual.logout');
 });

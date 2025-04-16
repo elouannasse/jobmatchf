@@ -24,15 +24,14 @@
                         <!-- Confirm password Form -->
                         <x-auth-session-status class="mb-4" :status="session('status')"/>
 
-                        <form method="POST" action="{{ route('password.confirm') }}">
+                        <form method="POST" action="{{ route('manual.password.confirm') }}">
                             @csrf
 
                             <div class="mb-4">
                                 <div class="input-group input-group-lg">
                                     <input type="password" id="password"
                                            name="password" placeholder="Password"
-                                           class="form-control" required autofocus
-                                    >
+                                           class="form-control" required autofocus>
                                     <span class="input-group-text"><i class="fa fa-asterisk"></i></span>
                                 </div>
                                 @error('password')
@@ -42,11 +41,11 @@
 
                             <div class="text-center mb-4">
                                 <button type="submit" class="btn btn-hero btn-primary">
-                                    Confirm
+                                    Confirmer
                                 </button>
                             </div>
                         </form>
-                        <!-- END Sign In Form -->
+                        <!-- END Confirm password form -->
                     </div>
                 </div>
                 <!-- END Sign In Block -->
@@ -54,5 +53,4 @@
         </div>
     </div>
     <!-- END Page Content -->
-
 @endsection

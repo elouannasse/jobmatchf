@@ -29,7 +29,7 @@
                         <!-- END Header -->
 
                         <!-- Sign Up Form -->
-                        <form class="js-validation-signup" action="{{ route('register') }}" method="POST">
+                        <form class="js-validation-signup" action="{{ route('manual.register') }}" method="POST">
                             @csrf
 
                             <div class="mb-3">
@@ -106,6 +106,9 @@
                                 <button type="submit" class="btn w-100 btn-hero btn-primary">
                                     <i class="fa fa-fw fa-plus opacity-50 me-1"></i> S'inscrire
                                 </button>
+                                <p class="mt-3">
+                                    <a href="{{ route('manual.login') }}">Déjà inscrit? Connectez-vous</a>
+                                </p>
                             </div>
                         </form>
                         <!-- END Sign Up Form -->
