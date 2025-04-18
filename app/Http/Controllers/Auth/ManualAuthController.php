@@ -25,24 +25,20 @@ class ManualAuthController extends Controller
     /**
      * Gérer la demande de connexion
      */
-    public function login(Request $request): RedirectResponse
-    {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+    public function login(Request $request)
+{
+    $credentials = $request->only('email', 'password');
 
-        $remember = $request->boolean('remember');
-
-        if (Auth::attempt($credentials, $remember)) {
-            $request->session()->regenerate();
-            return redirect()->intended(route('home', absolute: false));
-        }
-
-        return back()->withErrors([
-            'email' => 'Les informations d\'identification fournies ne correspondent pas à nos enregistrements.',
-        ])->onlyInput('email');
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+        return redirect()->intended('/home'); // ✅ redirection vers la route /home
     }
+
+    return back()->withErrors([
+        'email' => 'Les informations d’identification ne sont pas correctes.',
+    ])->onlyInput('email');
+}
+
 
     /**
      * Afficher la page d'inscription
@@ -97,34 +93,6 @@ class ManualAuthController extends Controller
 
         return redirect('/');
     }
+};
 
-    /**
-     * Afficher la page de mot de passe oublié
-     */
-    public function showForgotPasswordForm(): View
-    {
-        return view('auth.forgot-password');
-    }
-
-    /**
-     * Gérer la demande de réinitialisation de mot de passe
-     */
-    public function sendResetLinkEmail(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'email' => ['required', 'email'],
-        ]);
-
-        // Ici, tu peux implémenter ta logique personnalisée pour envoyer un email de réinitialisation
-        // Pour l'exemple, nous utilisons la méthode standard de Laravel
-
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
-
-        return $status == Password::RESET_LINK_SENT
-                    ? back()->with('status', __($status))
-                    : back()->withInput($request->only('email'))
-                        ->withErrors(['email' => __($status)]);
-    }
-}
+    

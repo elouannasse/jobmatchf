@@ -82,7 +82,7 @@
 {{-- dark-mode sidebar-dark--}}
  ">
     <!-- Side Overlay-->
-    @include('pages.overlay')
+    <!-- @include('pages.overlay') -->
     <!-- END Side Overlay -->
 
     <!-- Sidebar -->
