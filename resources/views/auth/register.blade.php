@@ -1,122 +1,165 @@
-@extends('layouts.auth')
-
-@section('js')
-    <!-- Page JS Code -->
-    <script src="{{asset('js/pages/op_auth_signup.min.js')}}"></script>
-@endsection
-
-@php
-    $roles = \App\Models\Role::whereNot('name', 'Administrateur')->get();
-@endphp
+@extends('layouts.app')
 
 @section('content')
-    <!-- Page Content -->
-    <div class="bg-image" style="background-image: url('{{asset('media/photos/photo14@2x.jpg')}}');">
-        <div class="row g-0 justify-content-center bg-black-75">
-            <div class="hero-static col-sm-8 col-md-6 col-xl-4 d-flex align-items-center p-2 px-sm-0">
-                <!-- Sign Up Block -->
-                <div class="block block-transparent block-rounded w-100 mb-0 overflow-hidden">
-                    <div
-                        class="block-content block-content-full px-lg-5 px-xl-6 py-2 py-md-3 py-lg-5
-                        bg-body-extra-light">
-                        <!-- Header -->
-                        <div class="mb-2 text-center">
-                            <a class="link-fx fw-bold fs-1" href="{{ route('home')}}">
-                                <span class="text-dark">Job</span><span class="text-primary">Match</span>
-                            </a>
-                            <p class="text-uppercase fw-bold fs-sm text-muted">Créer un nouveau compte</p>
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">{{ __('Inscription') }}</h4>
+                </div>
+
+                <div class="card-body p-4">
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
                         </div>
-                        <!-- END Header -->
+                    @endif
 
-                        <!-- Sign Up Form -->
-                        <form class="js-validation-signup" action="{{ route('manual.register') }}" method="POST">
-                            @csrf
+                    <form method="POST" action="{{ route('register') }}">
+                        @csrf
 
-                            <div class="mb-3">
-                                <div class="input-group input-group-lg">
-                                    <input type="text" class="form-control" id="name" name="name"
-                                           placeholder="Nom" value="{{ old('name') }}" autofocus>
-                                    <span class="input-group-text"><i class="fa fa-user-circle"></i></span>
-                                </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="name" class="form-label">{{ __('Nom') }}</label>
+                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>
                                 @error('name')
-                                <div class="text-danger mt-1 fs-sm">{{ $message }}</div>
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
                                 @enderror
                             </div>
 
-                            <div class="mb-3">
-                                <div class="input-group input-group-lg">
-                                    <input type="text" class="form-control" id="prenom" name="prenom"
-                                           placeholder="Prénom" value="{{ old('prenom') }}">
-                                    <span class="input-group-text"><i class="fa fa-user-circle"></i></span>
-                                </div>
+                            <div class="col-md-6">
+                                <label for="prenom" class="form-label">{{ __('Prénom') }}</label>
+                                <input id="prenom" type="text" class="form-control @error('prenom') is-invalid @enderror" name="prenom" value="{{ old('prenom') }}" required autocomplete="given-name">
                                 @error('prenom')
-                                <div class="text-danger mt-1 fs-sm">{{ $message }}</div>
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
                                 @enderror
                             </div>
+                        </div>
 
-                            <div class="mb-3">
-                                <div class="input-group input-group-lg">
-                                    <input type="email" class="form-control" id="email" name="email"
-                                           placeholder="Email" required value="{{ old('email') }}">
-                                    <span class="input-group-text"><i class="fa fa-envelope-open"></i></span>
-                                </div>
-                                @error('email')
-                                <div class="text-danger mt-1 fs-sm">{{ $message }}</div>
-                                @enderror
-                            </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">{{ __('Adresse e-mail') }}</label>
+                            <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email">
+                            @error('email')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
 
-                            <div class="mb-3">
-                                <div class="input-group input-group-lg">
-                                    <input type="password" class="form-control" id="password"
-                                           name="password" placeholder="Password">
-                                    <span class="input-group-text"><i class="fa fa-asterisk"></i></span>
-                                </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="password" class="form-label">{{ __('Mot de passe') }}</label>
+                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
                                 @error('password')
-                                <div class="text-danger mt-1 fs-sm">{{ $message }}</div>
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="password-confirm" class="form-label">{{ __('Confirmer le mot de passe') }}</label>
+                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="role_id" class="form-label">{{ __('Type d\'utilisateur') }}</label>
+                            <select id="role_id" class="form-select @error('role_id') is-invalid @enderror" name="role_id" required>
+                                <option value="">{{ __('Sélectionnez votre profil') }}</option>
+                                @foreach($roles as $role)
+                                    @if($role->name != 'Administrateur')
+                                        <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>
+                                            {{ $role->name }}
+                                        </option>
+                                    @endif
+                                @endforeach
+                            </select>
+                            @error('role_id')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+
+                        <div id="recruteur_fields" class="d-none">
+                            <div class="mb-3">
+                                <label for="nom_entreprise" class="form-label">{{ __('Nom de l\'entreprise') }}</label>
+                                <input id="nom_entreprise" type="text" class="form-control @error('nom_entreprise') is-invalid @enderror" name="nom_entreprise" value="{{ old('nom_entreprise') }}">
+                                @error('nom_entreprise')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
                                 @enderror
                             </div>
 
                             <div class="mb-3">
-                                <div class="input-group input-group-lg">
-                                    <input type="password" class="form-control" id="password_confirmation"
-                                           name="password_confirmation" placeholder="Password Confirm">
-                                    <span class="input-group-text"><i class="fa fa-asterisk"></i></span>
-                                </div>
-                                @error('password_confirmation')
-                                <div class="text-danger mt-1 fs-sm">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="mb-4">
-                                <select class="form-select form-control" name="role_id"
-                                        data-placeholder="Choisir votre type l'utilisateur" id="role_id">
-                                    <option value="">Choisir votre type l'utilisateur</option>
-                                    @foreach ($roles as $role)
-                                        <option value="{{ $role->id }}">
-                                            {{ $role->name }}
+                                <label for="type_entreprise_id" class="form-label">{{ __('Type d\'entreprise') }}</label>
+                                <select id="type_entreprise_id" class="form-select @error('type_entreprise_id') is-invalid @enderror" name="type_entreprise_id">
+                                    <option value="">{{ __('Sélectionnez le type d\'entreprise') }}</option>
+                                    @foreach($typesEntreprise as $type)
+                                        <option value="{{ $type->id }}" {{ old('type_entreprise_id') == $type->id ? 'selected' : '' }}>
+                                            {{ $type->nom }}
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('role_id')
-                                <div class="text-danger mt-1 fs-sm">{{ $message }}</div>
+                                @error('type_entreprise_id')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
                                 @enderror
                             </div>
+                        </div>
 
-                            <div class="text-center">
-                                <button type="submit" class="btn w-100 btn-hero btn-primary">
-                                    <i class="fa fa-fw fa-plus opacity-50 me-1"></i> S'inscrire
-                                </button>
-                                <p class="mt-3">
-                                    <a href="{{ route('manual.login') }}">Déjà inscrit? Connectez-vous</a>
-                                </p>
-                            </div>
-                        </form>
-                        <!-- END Sign Up Form -->
-                    </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                {{ __('S\'inscrire') }}
+                            </button>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <p>{{ __('Vous avez déjà un compte?') }} <a href="{{ route('login') }}">{{ __('Connectez-vous') }}</a></p>
+                        </div>
+                    </form>
                 </div>
             </div>
-            <!-- END Sign Up Block -->
         </div>
     </div>
-    <!-- END Page Content -->
+</div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleSelect = document.getElementById('role_id');
+        const recruteurFields = document.getElementById('recruteur_fields');
+        
+        // Vérifier l'état initial
+        toggleRecruteurFields();
+        
+        // Ajouter l'écouteur d'événements
+        roleSelect.addEventListener('change', toggleRecruteurFields);
+        
+        function toggleRecruteurFields() {
+            // Obtenir la valeur du texte de l'option sélectionnée
+            const selectedOption = roleSelect.options[roleSelect.selectedIndex];
+            const isRecruteur = selectedOption.text === 'Recruteur';
+            
+            if (isRecruteur) {
+                recruteurFields.classList.remove('d-none');
+            } else {
+                recruteurFields.classList.add('d-none');
+            }
+        }
+    });
+</script>
+@endpush
 @endsection

@@ -3,70 +3,83 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
-use Illuminate\View\View;
+use App\Models\Role;
+use App\Models\TypeEntreprise;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rules\Password;
 
 class ManualAuthController extends Controller
 {
     /**
-     * Afficher la page de connexion
+     *    
      */
-    public function showLoginForm(): View
+    public function showLoginForm()
     {
         return view('auth.login');
     }
 
     /**
-     * Gérer la demande de connexion
      */
     public function login(Request $request)
-{
-    $credentials = $request->only('email', 'password');
-
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
-        return redirect()->intended('/home'); // ✅ redirection vers la route /home
-    }
-
-    return back()->withErrors([
-        'email' => 'Les informations d’identification ne sont pas correctes.',
-    ])->onlyInput('email');
-}
-
-
-    /**
-     * Afficher la page d'inscription
-     */
-    public function showRegisterForm(): View
     {
-        return view('auth.register');
-    }
-
-    /**
-     * Gérer la demande d'inscription
-     */
-    public function register(Request $request): RedirectResponse
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => ['required', 'string', 'max:255'],
-            'prenom' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role_id' => ['required', 'exists:roles,id'],
-        ], [
-            'role_id.required' => "Le type d'utilisateur est requis.",
-            'role_id.exists' => "Le type d'utilisateur sélectionné n'existe pas.",
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
         ]);
-
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
+        
+        // Chercher l'utilisateur manuellement
+        $user = User::where('email', $request->email)->first();
+        
+        // Si l'utilisateur n'existe pas
+        if (!$user) {
+            return back()->withErrors([
+                'email' => 'Utilisateur introuvable avec cet email.',
+            ]);
         }
+        
+        // Vérifier le mot de passe manuellement
+        if (!Hash::check($request->password, $user->password)) {
+            return back()->withErrors([
+                'email' => 'Mot de passe incorrect.',
+            ]);
+        }
+        
+        // Si tout est bon, connecter l'utilisateur manuellement
+        Auth::login($user);
+        $request->session()->regenerate();
+        
+        return redirect()->route('home');
+    }
+    /**
+     */
+    public function showRegisterForm()
+    {
+        $roles = Role::whereIn('name', [
+            'Candidat', 
+            'Recruteur'
+        ])->get();
+        
+        $typesEntreprise = TypeEntreprise::all();
+        
+        return view('auth.register', compact('roles', 'typesEntreprise'));
+    }
+
+    /**
+     */
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:8|confirmed',
+            'role_id' => 'required|exists:roles,id',
+        ], [
+            'role_id.required' => "Le type d'utilisateur est requis",
+            'role_id.exists' => "Le type d'utilisateur n'existe pas",
+        ]);
 
         $user = User::create([
             'name' => $request->name,
@@ -78,13 +91,12 @@ class ManualAuthController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('manual.login', absolute: false));
+        return redirect()->route('home');
     }
 
     /**
-     * Déconnecter l'utilisateur
      */
-    public function logout(Request $request): RedirectResponse
+    public function logout(Request $request)
     {
         Auth::logout();
 
@@ -93,6 +105,4 @@ class ManualAuthController extends Controller
 
         return redirect('/');
     }
-};
-
-    
+}

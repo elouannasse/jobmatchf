@@ -8,17 +8,10 @@ use Illuminate\Support\Facades\Auth;
 
 class ManualAuthenticate
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
     public function handle(Request $request, Closure $next)
     {
         if (!Auth::check()) {
-            return redirect()->route('manual.login');
+            return redirect()->route('login')->with('error', 'يجب عليك تسجيل الدخول أولاً.');
         }
 
         return $next($request);

@@ -21,4 +21,9 @@ class AppServiceProvider extends ServiceProvider
     {
         //
     }
+
+    protected $policies = [
+        
+        \App\Models\Candidature::class => \App\Policies\CandidaturePolicy::class,
+    ];
 }

@@ -66,6 +66,15 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Relation avec les rôles (pour compatibilité avec le code existant)
+     * Alias pour la méthode role() pour maintenir la compatibilité
+     */
+    public function roles()
+    {
+        return $this->role();
+    }
+
+    /**
      * Vérifie si l'utilisateur est un recruteur.
      */
     public function isRecruteur(): bool
@@ -126,11 +135,12 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Les formations de cet utilisateur.
+     * Commenté car la classe Formation n'existe pas encore
      */
-    public function formations(): HasMany
-    {
-        return $this->hasMany(Formation::class);
-    }
+    // public function formations(): HasMany
+    // {
+    //     return $this->hasMany(Formation::class);
+    // }
 
     /**
      * Les offres d'emplois de cet utilisateur.
@@ -146,6 +156,40 @@ class User extends Authenticatable implements MustVerifyEmail
     public function candidatures(): HasMany
     {
         return $this->hasMany(Candidature::class);
+    }
+
+    /**
+     * Get the candidature details for the user if they are a candidate.
+     */
+    public function candidatureDetails(): HasMany
+    {
+        return $this->hasMany(Candidature::class);
+    }
+
+    /**
+     * Get all messages sent by the user.
+     */
+    public function sentMessages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    /**
+     * Get all messages received by the user.
+     */
+    public function receivedMessages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'recipient_id');
+    }
+
+    /**
+     * Get unread messages for the user.
+     */
+    public function unreadMessages()
+    {
+        return $this->receivedMessages()
+            ->whereNull('read_at')
+            ->where('deleted_by_recipient', false);
     }
 
     /**

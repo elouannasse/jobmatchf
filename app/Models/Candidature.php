@@ -2,31 +2,40 @@
 
 namespace App\Models;
 
-use App\Enums\StatutCandidature;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Candidature extends Model
 {
+    use HasFactory;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
-        'lettre_motivation',
-        'cv',
-        'statut',
-        'offre_id',
         'user_id',
+        'offre_id',
+        'lettre_motivation',
+        'cv', 
+        'statut',
+        'date_candidature',
     ];
 
-    protected $casts = [
-        'statut' => StatutCandidature::class,
-    ];
-
-    public function offre(): BelongsTo
-    {
-        return $this->belongsTo(Offre::class);
-    }
-
-    public function user(): BelongsTo
+    /**
+     * Get the user that owns the candidature.
+     */
+    public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the offre that the candidature belongs to.
+     */
+    public function offre()
+    {
+        return $this->belongsTo(Offre::class);
     }
 }
