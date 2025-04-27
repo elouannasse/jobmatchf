@@ -1,5 +1,9 @@
 @extends('layouts.dashboard')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/offres-style.css') }}">
+@endpush
+
 @section('content')
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -16,7 +20,7 @@
                     <h6 class="m-0 font-weight-bold text-primary">{{ __('Formulaire de modification') }}</h6>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="{{ route('offres.update', $offre->id) }}">
+                    <form method="POST" action="{{ route('offres.update', $offre->id) }}" class="offre-form">
                         @csrf
                         @method('PUT')
 

@@ -71,20 +71,19 @@ class HomeController extends Controller
     {
         $user = auth()->user();
         
-        $stats = [
-            'total_offres' => $user->offres()->count(),
-            'offres_actives' => $user->offres()->where('etat', true)->count(),
-            'total_candidatures' => Candidature::whereHas('offre', function($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })->count(),
-            'candidatures_nouvelles' => Candidature::whereHas('offre', function($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })->where('statut', 'en_attente')->count(),
-        ];
+        $totalOffres = $user->offres()->count();
+        $offresActives = $user->offres()->where('etat', true)->count();
+        $totalCandidatures = Candidature::whereHas('offre', function($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })->count();
         
-        $offres_recentes = $user->offres()->with('candidatures')->latest()->take(5)->get();
+        $recentOffres = $user->offres()->latest()->take(5)->get();
         
-        return view('recruteur.dashboard', compact('stats', 'offres_recentes'));
+        $recentCandidatures = Candidature::whereHas('offre', function($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })->with(['user', 'offre'])->latest()->take(5)->get();
+        
+        return view('home', compact('totalOffres', 'offresActives', 'totalCandidatures', 'recentOffres', 'recentCandidatures'));
     }
 
     /**
