@@ -26,6 +26,11 @@ class Offre extends Model
         'date_limite',
         'etat',
         'approved',  // Ajout du champ pour l'approbation
+        'title',
+        'salaire_proposer',
+        'type_offre',
+        'date_debut',
+        'date_fin',
         // Autres champs existants...
     ];
 

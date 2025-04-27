@@ -60,18 +60,19 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
         
         // Correction: utiliser un seul nom de route pour la suppression d'utilisateur
-        Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
+        Route::delete('/users/{userId}', [AdminController::class, 'destroyUser'])->name('users.destroy');
         
         Route::get('/statistics', [AdminController::class, 'statistics'])->name('statistics');
         Route::get('/offres', [AdminController::class, 'offres'])->name('offres');
         Route::get('/candidatures', [AdminController::class, 'candidatures'])->name('candidatures');
         Route::get('/users', [AdminController::class, 'users'])->name('users');
 
-        Route::put('/offres/{offre}/approve', [AdminController::class, 'approveOffre'])->name('offres.approve');
-        Route::put('/offres/{offre}/toggle-status', [AdminController::class, 'toggleOffreStatus'])->name('offres.toggle-status');
+        Route::put('/offres/{offreId}/approve', [AdminController::class, 'approveOffre'])->name('offres.approve');
+        Route::put('/offres/{offreId}/reject', [AdminController::class, 'rejectOffre'])->name('offres.reject');
+        Route::put('/offres/{offreId}/toggle-status', [AdminController::class, 'toggleOffreStatus'])->name('offres.toggle-status');
         
         // Modifié pour utiliser la méthode existante deleteCandidature au lieu de destroyCandidature
-        Route::delete('/candidatures/{candidature}', [AdminController::class, 'deleteCandidature'])->name('candidatures.destroy');
+        Route::delete('/candidatures/{candidatureId}', [AdminController::class, 'deleteCandidature'])->name('candidatures.destroy');
         
         Route::get('/candidats/create', [AdminController::class, 'createCandidate'])->name('candidats.create');
         Route::post('/candidats', [AdminController::class, 'storeCandidate'])->name('candidats.store');

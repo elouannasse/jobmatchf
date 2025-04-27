@@ -12,7 +12,7 @@ class Role extends Model
 
     public $timestamps = false;
 
-    protected $fillable = [];
+    protected $fillable = ['id', 'name'];
 
     public function users(): HasMany
     {

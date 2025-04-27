@@ -10,6 +10,9 @@ use App\Models\Candidature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Services\Admin\AdminOffreService;
+use App\Services\UserService;
+use App\Services\CandidatureService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use App\Notifications\OffreStatusNotification;
@@ -17,12 +20,36 @@ use App\Notifications\OffreStatusNotification;
 class AdminController extends Controller
 {
     /**
+     * @var AdminOffreService
+     */
+    private $adminOffreService;
+    
+    /**
+     * @var UserService
+     */
+    private $userService;
+    
+    /**
+     * @var CandidatureService
+     */
+    private $candidatureService;
+
+    /**
      * Create a new controller instance.
      *
+     * @param AdminOffreService $adminOffreService
+     * @param UserService $userService
+     * @param CandidatureService $candidatureService
      * @return void
      */
-    public function __construct()
-    {
+    public function __construct(
+        AdminOffreService $adminOffreService,
+        UserService $userService,
+        CandidatureService $candidatureService
+    ) {
+        $this->adminOffreService = $adminOffreService;
+        $this->userService = $userService;
+        $this->candidatureService = $candidatureService;
         $this->middleware('auth');
         // $this->middleware('role:admin');
     }
@@ -95,7 +122,7 @@ class AdminController extends Controller
      */
     public function users()
     {
-        $users = User::with('role')->latest()->paginate(10);
+        $users = $this->userService->getAllUsers(10);
         return view('admin.users', compact('users'));
     }
 
@@ -130,64 +157,39 @@ class AdminController extends Controller
     /**
      * Show all job offers with statistics.
      *
+     * @param Request $request
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function offres(Request $request)
     {
-        // Filtres sur les offres
-        $query = Offre::with(['user', 'candidatures']);
-
+        // Get the filters from the request
+        $filters = [];
+        
         if ($request->has('etat')) {
-            $query->where('etat', $request->etat);
+            $filters['etat'] = $request->etat;
         }
-
+        
         if ($request->has('approved')) {
-            $query->where('approved', $request->approved);
+            $filters['approved'] = $request->approved;
         }
-
+        
         if ($request->has('pending')) {
-            $query->whereNull('approved');
+            $filters['pending'] = true;
         }
-
-        $offres = $query->latest()->paginate(10);
-
-        // Statistiques pour les graphiques
-
-        // 1. Statistiques par type de contrat
-        $statsContrat = Offre::select('type_contrat', DB::raw('count(*) as total'))
-            ->groupBy('type_contrat')
-            ->orderBy('total', 'desc')
-            ->get();
-
-        // 2. Statistiques par lieu (top 5)
-        $statsLieux = Offre::select('lieu', DB::raw('count(*) as total'))
-            ->groupBy('lieu')
-            ->orderBy('total', 'desc')
-            ->take(5)
-            ->get();
-
-        // 3. Statistiques des offres par mois (derniers 6 mois)
-        $statsMonthly = [];
-        $labels = [];
-
-        for ($i = 5; $i >= 0; $i--) {
-            $date = now()->startOfMonth()->subMonths($i);
-            $labels[] = $date->format('M Y');
-
-            $count = Offre::whereYear('created_at', $date->year)
-                ->whereMonth('created_at', $date->month)
-                ->count();
-
-            $statsMonthly[] = $count;
-        }
-
-        return view('admin.offres', compact(
-            'offres',
-            'statsContrat',
-            'statsLieux',
-            'statsMonthly',
-            'labels'
-        ));
+        
+        // Get paginated job offers with filters
+        $offres = $this->adminOffreService->getAllOffers($filters, 10);
+        
+        // Get statistics for charts
+        $stats = $this->adminOffreService->getOfferStatistics();
+        
+        return view('admin.offres', [
+            'offres' => $offres,
+            'statsContrat' => $stats['statsContrat'],
+            'statsLieux' => $stats['statsLieux'],
+            'statsMonthly' => $stats['statsMonthly'],
+            'labels' => $stats['labels']
+        ]);
     }
 
     /**
@@ -197,7 +199,7 @@ class AdminController extends Controller
      */
     public function showPendingOffers()
     {
-        $offres = Offre::where('etat', false)->with('user')->latest()->paginate(10);
+        $offres = $this->adminOffreService->getPendingOffers(10);
         return view('admin.offres-pending', compact('offres'));
     }
 
@@ -216,66 +218,56 @@ class AdminController extends Controller
     /**
      * Approve a job offer.
      *
-     * @param Offre $offre
+     * @param int $offreId
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function approveOffre(Offre $offre)
+    public function approveOffre(int $offreId)
     {
-        // تعيين القيم بشكل صريح
-        $offre->etat = 1;
-        $offre->approved = 1;
-        $offre->save();
+        $result = $this->adminOffreService->approveOffer($offreId);
         
-        // إشعار المجند
-        $offre->user->notify(new OffreStatusNotification($offre, true));
+        if ($result) {
+            return redirect()->back()->with('success', 'L\'offre a été approuvée avec succès.');
+        }
         
-        return redirect()->back()->with('success', 'L\'offre a été approuvée avec succès.');
+        return redirect()->back()->with('error', 'Un problème est survenu lors de l\'approbation de l\'offre.');
     }
 
     /**
      * Reject a job offer.
      *
      * @param Request $request
-     * @param Offre $offre
+     * @param int $offreId
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function rejectOffre(Request $request, Offre $offre)
+    public function rejectOffre(Request $request, int $offreId)
     {
-        // You can add a rejection reason field if needed
-        $offre->etat = false;
-
-        // Marquer comme rejeté si la colonne existe
-        if (Schema::hasColumn('offres', 'approved')) {
-            $offre->approved = false;
+        $result = $this->adminOffreService->rejectOffer($offreId);
+        
+        if ($result) {
+            return redirect()->back()->with('success', 'L\'offre a été rejetée.');
         }
-
-        $offre->save();
-
-        // Notify the recruiter that their offer has been rejected
-        $offre->user->notify(new OffreStatusNotification($offre, false));
-
-        return redirect()->back()->with('success', 'L\'offre a été rejetée.');
+        
+        return redirect()->back()->with('error', 'Un problème est survenu lors du rejet de l\'offre.');
     }
 
     /**
      * Toggle the status of an offer.
      * 
-     * @param Offre $offre
+     * @param int $offreId
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function toggleOffreStatus(Offre $offre)
+    public function toggleOffreStatus(int $offreId)
     {
-        $offre->etat = !$offre->etat;
+        $result = $this->adminOffreService->toggleOfferStatus($offreId);
+        // Get the updated offre to check its status
+        $updatedOffre = Offre::find($offreId);
         
-        // إذا تم تفعيل العرض، تأكد من تعيين approved أيضاً
-        if ($offre->etat) {
-            $offre->approved = 1;
+        if ($result) {
+            $status = $updatedOffre && $updatedOffre->etat ? 'activée' : 'désactivée';
+            return redirect()->back()->with('success', "L'offre a été {$status} avec succès.");
         }
         
-        $offre->save();
-
-        $status = $offre->etat ? 'activée' : 'désactivée';
-        return redirect()->back()->with('success', "L'offre a été {$status} avec succès.");
+        return redirect()->back()->with('error', 'Un problème est survenu lors de la modification du statut de l\'offre.');
     }
 
     /**
@@ -365,7 +357,7 @@ class AdminController extends Controller
      */
     public function candidatures()
     {
-        $candidatures = Candidature::with(['user', 'offre.user'])->latest()->paginate(10);
+        $candidatures = $this->candidatureService->getAllCandidatures(10);
 
         // Ajouter le comptage des candidatures par statut
         $enAttente = Candidature::where('statut', 'en_attente')->count();
@@ -464,16 +456,15 @@ class AdminController extends Controller
             'role_id' => 'required|exists:roles,id',
         ]);
 
-        // Create the user with role_id directly (since it's a BelongsTo relationship)
-        $user = User::create([
-            'name' => $request->name,
-            'prenom' => $request->prenom,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role_id' => $request->role_id, // Directly assign role_id
-        ]);
+        $user = $this->userService->createUser($request->all());
 
-        return redirect()->route('admin.users')->with('success', 'Utilisateur créé avec succès.');
+        if ($user) {
+            return redirect()->route('admin.users')->with('success', 'Utilisateur créé avec succès.');
+        }
+
+        return redirect()->route('admin.users.create')
+            ->with('error', 'Erreur lors de la création de l\'utilisateur')
+            ->withInput();
     }
 
     /**
@@ -532,27 +523,39 @@ class AdminController extends Controller
     /**
      * Delete a user.
      *
-     * @param User $user
+     * @param int $userId
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroyUser(User $user)
+    public function destroyUser(int $userId)
     {
-        $user->delete();
+        $result = $this->userService->deleteUser($userId);
+        
+        if ($result) {
+            return redirect()->route('admin.users')
+                ->with('success', 'Utilisateur supprimé avec succès');
+        }
+        
         return redirect()->route('admin.users')
-            ->with('success', 'Utilisateur supprimé avec succès');
+            ->with('error', 'Erreur lors de la suppression de l\'utilisateur');
     }
 
     /**
      * Delete a candidature.
      *
-     * @param Candidature $candidature
+     * @param int $candidatureId
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function deleteCandidature(Candidature $candidature)
+    public function deleteCandidature(int $candidatureId)
     {
-        $candidature->delete();
+        $result = $this->candidatureService->deleteCandidature($candidatureId);
 
-        return redirect()->route('admin.candidatures')->with('success', 'La candidature a été supprimée avec succès.');
+        if ($result) {
+            return redirect()->route('admin.candidatures')
+                ->with('success', 'La candidature a été supprimée avec succès.');
+        }
+        
+        return redirect()->route('admin.candidatures')
+            ->with('error', 'Une erreur est survenue lors de la suppression de la candidature.');
     }
 
     /**
@@ -580,22 +583,14 @@ class AdminController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        // Get the role ID for 'candidat'
-        $candidatRole = Role::where('name', 'candidat')->first();
+        $candidate = $this->userService->createCandidate($request->all());
 
-        if (!$candidatRole) {
-            return redirect()->back()->with('error', 'Le rôle "candidat" n\'existe pas.');
+        if ($candidate) {
+            return redirect()->route('admin.candidats')->with('success', 'Le candidat a été créé avec succès.');
         }
 
-        // Create the candidate user with role_id directly
-        $candidate = User::create([
-            'name' => $request->name,
-            'prenom' => $request->prenom,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role_id' => $candidatRole->id, // Directly assign role_id
-        ]);
-
-        return redirect()->route('admin.candidats')->with('success', 'Le candidat a été créé avec succès.');
+        return redirect()->back()
+            ->with('error', 'Erreur lors de la création du candidat. Vérifiez que le rôle "candidat" existe.')
+            ->withInput();
     }
 }

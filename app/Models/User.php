@@ -19,6 +19,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public const ROLE_ADMINISTRATEUR = 'Administrateur';
     public const ROLE_RECRUTEUR = 'Recruteur';
     public const ROLE_CANDIDAT = 'Candidat';
+    
+    // Role IDs - these should match the IDs in the database
+    public const ROLE_ADMINISTRATEUR_ID = 1;
+    public const ROLE_RECRUTEUR_ID = 2;
+    public const ROLE_CANDIDAT_ID = 3;
 
     /**
      * The attributes that are mass assignable.

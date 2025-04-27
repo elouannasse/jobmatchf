@@ -50,6 +50,6 @@
             </tbody>
         </table>
 
-        {{ $offres->links() }}
+        {{ $offres->links('components.pagination') }}
     </div>
 @endsection
