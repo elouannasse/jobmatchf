@@ -93,9 +93,13 @@
                             </button>
                         </form>
 
-                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <button type="button" class="btn btn-danger" id="directDeleteBtn" data-offre-id="{{ $offre->id }}">
                             <i class="fas fa-trash me-1"></i> {{ __('Supprimer') }}
                         </button>
+                        <form id="direct-delete-form-{{ $offre->id }}" action="{{ route('offres.destroy', $offre->id) }}" method="POST" style="display: none;">
+                            @csrf
+                            @method('DELETE')
+                        </form>
                     </div>
                 </div>
             </div>
@@ -212,6 +216,27 @@
         // Notification de copie
         alert("URL copiée dans le presse-papiers!");
     }
+
+    // Script pour la suppression directe
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteBtn = document.getElementById('directDeleteBtn');
+        
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const offreId = this.getAttribute('data-offre-id');
+                
+                if (confirm('Êtes-vous sûr de vouloir supprimer cette offre? Cette action est irréversible.')) {
+                    // Soumettre le formulaire de suppression
+                    const form = document.getElementById('direct-delete-form-' + offreId);
+                    if (form) {
+                        form.submit();
+                    }
+                }
+            });
+        }
+    });
 </script>
 @endpush
 @endsection
