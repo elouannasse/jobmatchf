@@ -128,6 +128,19 @@
                             <i class="fas fa-trash me-1"></i> {{ __('Supprimer cette offre') }}
                         </button>
                     </div>
+                    <hr>
+                    <div class="mt-3">
+                        <p>{{ __('Si le bouton ci-dessus ne fonctionne pas, utilisez celui-ci :') }}</p>
+                        <form id="delete-offer-form" action="{{ route('offres.destroy', $offre->id) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-danger delete-offer-btn">
+                                    <i class="fas fa-exclamation-triangle me-1"></i> {{ __('Supprimer définitivement cette offre') }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -190,7 +203,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Annuler') }}</button>
-                <form action="{{ route('offres.destroy', $offre->id) }}" method="POST">
+                <form id="delete-form" action="{{ route('offres.destroy', $offre->id) }}" method="POST">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">{{ __('Supprimer définitivement') }}</button>
@@ -200,3 +213,7 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/delete-confirmation.js') }}"></script>
+@endpush

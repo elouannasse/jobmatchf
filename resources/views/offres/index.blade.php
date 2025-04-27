@@ -87,42 +87,13 @@
                                         <a href="{{ route('offres.edit', $offre->id) }}" class="action-btn action-btn-edit" title="{{ __('Modifier') }}">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <button type="button" class="action-btn action-btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $offre->id }}" title="{{ __('Supprimer') }}">
+                                        <button type="button" class="action-btn action-btn-delete" data-offre-id="{{ $offre->id }}" title="{{ __('Supprimer') }}">
                                             <i class="fas fa-trash"></i>
                                         </button>
-                                    </div>
-
-                                    <!-- Modal de confirmation de suppression -->
-                                    <div class="modal fade" id="deleteModal{{ $offre->id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $offre->id }}" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="deleteModalLabel{{ $offre->id }}">{{ __('Confirmer la suppression') }}</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div style="display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1rem;">
-                                                        <i class="fas fa-exclamation-triangle" style="color: var(--warning-color); font-size: 1.5rem;"></i>
-                                                        <div>
-                                                            <p style="font-weight: 600; margin-bottom: 0.5rem;">{{ __('Êtes-vous sûr de vouloir supprimer cette offre ?') }}</p>
-                                                            <p style="color: var(--danger-color); margin-bottom: 0;">{{ __('Cette action est irréversible.') }}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">
-                                                        <i class="fas fa-times me-1"></i> {{ __('Annuler') }}
-                                                    </button>
-                                                    <form action="{{ route('offres.destroy', $offre->id) }}" method="POST" class="d-inline">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-delete-confirm">
-                                                            <i class="fas fa-trash me-1"></i> {{ __('Supprimer') }}
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <form id="delete-form-{{ $offre->id }}" action="{{ route('offres.destroy', $offre->id) }}" method="POST" style="display: none;">
+                                            @csrf
+                                            @method('DELETE')
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -233,4 +204,6 @@
 
 @push('scripts')
 <script src="{{ asset('js/modern-offers.js') }}"></script>
+<script src="{{ asset('js/direct-delete.js') }}"></script>
+<script src="{{ asset('js/modal-fix.js') }}"></script>
 @endpush
