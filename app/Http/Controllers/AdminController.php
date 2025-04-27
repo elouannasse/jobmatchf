@@ -221,34 +221,14 @@ class AdminController extends Controller
      */
     public function approveOffre(Offre $offre)
     {
-        // Set the offer to active state - استخدم 1 بدلاً من true
+        // تعيين القيم بشكل صريح
         $offre->etat = 1;
-    
-        // Marquer comme approuvé - استخدم 1 بدلاً من true ولا تتحقق من وجود العمود
         $offre->approved = 1;
-    
-        // تسجيل معلومات التصحيح
-        \Log::info('Approving offer', [
-            'id' => $offre->id,
-            'before_etat' => $offre->getOriginal('etat'),
-            'before_approved' => $offre->getOriginal('approved'),
-            'after_etat' => $offre->etat,
-            'after_approved' => $offre->approved
-        ]);
-    
         $offre->save();
-    
-        // تحقق مما تم حفظه في قاعدة البيانات
-        $saved = Offre::find($offre->id);
-        \Log::info('Offer after save', [
-            'id' => $saved->id,
-            'saved_etat' => $saved->etat,
-            'saved_approved' => $saved->approved
-        ]);
-    
-        // Notify the recruiter that their offer has been approved
+        
+        // إشعار المجند
         $offre->user->notify(new OffreStatusNotification($offre, true));
-    
+        
         return redirect()->back()->with('success', 'L\'offre a été approuvée avec succès.');
     }
 
@@ -286,6 +266,12 @@ class AdminController extends Controller
     public function toggleOffreStatus(Offre $offre)
     {
         $offre->etat = !$offre->etat;
+        
+        // إذا تم تفعيل العرض، تأكد من تعيين approved أيضاً
+        if ($offre->etat) {
+            $offre->approved = 1;
+        }
+        
         $offre->save();
 
         $status = $offre->etat ? 'activée' : 'désactivée';
@@ -458,7 +444,7 @@ class AdminController extends Controller
      */
     public function createUser()
     {
-        $roles = \App\Models\Role::all();
+        $roles =Role::all();
         return view('admin.create-user', compact('roles'));
     }
 

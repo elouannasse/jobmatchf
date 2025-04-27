@@ -119,4 +119,14 @@ class Offre extends Model
     {
         return $query->where('etat', true)->where('approved', true);
     }
+
+    protected static function booted()
+{
+    static::saving(function ($offre) {
+       
+        if ($offre->etat) {
+            $offre->approved = true;
+        }
+    });
+}
 }

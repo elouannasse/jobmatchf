@@ -19,7 +19,7 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next, string $role)
     {
         if (!$request->user() || !$this->checkRole($request->user(), $role)) {
-            abort(403, "غير مصرح لك بالوصول.");
+            abort(403, "   non.");
         }
 
         return $next($request);

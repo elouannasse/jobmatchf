@@ -67,7 +67,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         
-        // أضف وسطاء التطبيق المخصصة هنا
         'auth.manual' => \App\Http\Middleware\ManualAuthenticate::class,
         'role' => \App\Http\Middleware\RoleMiddleware::class,
         'check.role' => \App\Http\Middleware\CheckUserRole::class,
