@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('offres', function (Blueprint $table) {
-            // تحقق من وجود الأعمدة قبل إضافتها
             if (!Schema::hasColumn('offres', 'titre')) {
                 $table->string('titre');
             }
@@ -43,7 +42,6 @@ return new class extends Migration
             
             if (!Schema::hasColumn('offres', 'user_id')) {
                 $table->unsignedBigInteger('user_id');
-                // إضافة مفتاح أجنبي إذا كان الجدول فارغًا
                 if (Schema::hasTable('users') && count(DB::select('SELECT * FROM offres')) == 0) {
                     $table->foreign('user_id')->references('id')->on('users');
                 }
@@ -56,6 +54,5 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // لا تقم بإلغاء أي شيء في down لتجنب حذف البيانات الموجودة
     }
 };

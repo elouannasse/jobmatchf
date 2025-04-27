@@ -20,7 +20,7 @@ class OffreController extends Controller
     /**
      * @var OffreService
      */
-    private $offreService;
+    private $offreService; 
 
     /**
      * Constructeur: vérifie l'authentification et le rôle de l'utilisateur et injecte les dépendances
