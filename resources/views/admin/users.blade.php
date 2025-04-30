@@ -91,5 +91,21 @@
 
 @push('scripts')
 <script src="{{ asset('js/delete-modal.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const form = this.closest('form');
+                const userName = form.getAttribute('data-user-name');
+
+                if (confirm(`Êtes-vous sûr de vouloir supprimer l'utilisateur ${userName} ?`)) {
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
 @endpush
 @endsection
