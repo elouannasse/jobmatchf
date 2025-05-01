@@ -1,4 +1,4 @@
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true" data-bs-backdrop="static">
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true" data-bs-backdrop="static" style="z-index: 9999;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
@@ -15,7 +15,7 @@
                 </div>
             </div>
             <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-outline-secondary px-4" id="cancelDelete" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-outline-secondary px-4" id="cancelDelete">Annuler</button>
                 <button type="button" class="btn btn-danger px-4" id="confirmDelete">Supprimer définitivement</button>
             </div>
         </div>
@@ -23,6 +23,15 @@
 </div>
 
 <style>
+    #deleteModal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+    }
     #deleteModal .modal-content {
         border-radius: 8px;
         box-shadow: 0 5px 15px rgba(0,0,0,0.2);

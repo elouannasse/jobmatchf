@@ -56,12 +56,15 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     
-                                    <form id="delete-form-{{ $user->id }}" action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-inline" data-user-name="{{ $user->name }}" data-user-id="{{ $user->id }}">
+                                    <button type="button" class="btn btn-sm btn-outline-danger delete-btn" 
+                                            data-user-name="{{ $user->name }}" 
+                                            data-user-id="{{ $user->id }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    
+                                    <form id="delete-form-{{ $user->id }}" action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-none">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="button" class="btn btn-sm btn-outline-danger delete-btn">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
                                     </form>
                                 </div>
                             </td>
@@ -82,8 +85,30 @@
     </div>
 </div>
 
-<!-- Include the shared delete confirmation modal -->
-@include('components.modals.delete-confirmation')
+<!-- Custom Delete Confirmation Modal -->
+<div class="modal" id="customDeleteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 9999;">
+    <div class="modal-dialog" style="margin: 10% auto; max-width: 500px;">
+        <div class="modal-content" style="background-color: white; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+            <div class="modal-header bg-danger text-white" style="padding: 15px; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close btn-close-white" id="closeModalBtn" style="background-color: transparent; border: none; color: white; font-size: 20px; cursor: pointer;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <div class="text-center">
+                    <i class="fas fa-exclamation-triangle text-danger" style="font-size: 48px; margin-bottom: 15px;"></i>
+                    <h4 id="customConfirmationMessage" style="margin-bottom: 15px;">Êtes-vous sûr de vouloir supprimer cet utilisateur?</h4>
+                    <div class="alert alert-warning" style="background-color: #fff3cd; color: #856404; padding: 15px; border-radius: 4px;">
+                        <i class="fas fa-exclamation-circle" style="margin-right: 8px;"></i> Cette action est irréversible et entraînera la suppression de toutes les données associées.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 15px; display: flex; justify-content: center; border-top: 1px solid #e9ecef;">
+                <button type="button" class="btn btn-secondary" id="customCancelDelete" style="background-color: #6c757d; color: white; padding: 8px 16px; margin-right: 10px; border: none; border-radius: 4px; cursor: pointer;">Annuler</button>
+                <button type="button" class="btn btn-danger" id="customConfirmDelete" style="background-color: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">Supprimer définitivement</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/modal.css') }}">
@@ -91,27 +116,61 @@
 
 @push('scripts')
 <script>
-    $(document).ready(function() {
-        // Direct implementation for user deletion
-        $('.delete-btn').on('click', function(e) {
-            e.preventDefault();
-            
-            // Get the form
-            const form = $(this).closest('form');
-            const userName = form.data('user-name');
-            
-            // Update modal content
-            $('#confirmationMessage').text('Êtes-vous sûr de vouloir supprimer l\'utilisateur ' + userName + ' ?');
-            
-            // Show modal
-            const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-            deleteModal.show();
-            
-            // When confirm button is clicked
-            $('#confirmDelete').off('click').on('click', function() {
-                form.submit();
-                deleteModal.hide();
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get elements
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        const modal = document.getElementById('customDeleteModal');
+        const closeBtn = document.getElementById('closeModalBtn');
+        const cancelBtn = document.getElementById('customCancelDelete');
+        const confirmBtn = document.getElementById('customConfirmDelete');
+        const confirmMessage = document.getElementById('customConfirmationMessage');
+        
+        let currentUserId = null;
+        
+        // Add click event to all delete buttons
+        deleteButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Get user info
+                const userName = this.getAttribute('data-user-name');
+                currentUserId = this.getAttribute('data-user-id');
+                
+                // Update confirmation message
+                confirmMessage.textContent = `Êtes-vous sûr de vouloir supprimer l'utilisateur ${userName} ?`;
+                
+                // Show modal
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden'; // Prevent scrolling
             });
+        });
+        
+        // Close modal function
+        function closeModal() {
+            modal.style.display = 'none';
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+        
+        // Close modal when clicking close button
+        closeBtn.addEventListener('click', closeModal);
+        
+        // Close modal when clicking cancel button
+        cancelBtn.addEventListener('click', closeModal);
+        
+        // Submit form when clicking confirm button
+        confirmBtn.addEventListener('click', function() {
+            if (currentUserId) {
+                const form = document.getElementById(`delete-form-${currentUserId}`);
+                if (form) {
+                    form.submit();
+                }
+            }
+            closeModal();
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                closeModal();
+            }
         });
     });
 </script>
