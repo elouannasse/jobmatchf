@@ -149,8 +149,8 @@
 
                     @if($candidature->cv)
                         <div class="d-grid gap-2">
-                            <a href="{{ asset('storage/' . $candidature->cv) }}" class="btn btn-outline-secondary" target="_blank">
-                                <i class="fas fa-file-pdf me-1"></i> {{ __('Voir le CV') }}
+                            <a href="{{ route('candidatures.telecharger-cv', $candidature->id) }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-file-pdf me-1"></i> {{ __('Télécharger le CV') }}
                             </a>
                         </div>
                     @endif

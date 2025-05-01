@@ -216,21 +216,42 @@ class CandidatureController extends Controller
      * Télécharger le CV d'une candidature
      */
     public function telechargerCV(Candidature $candidature)
-{
-    if (Auth::id() !== $candidature->user_id && Auth::id() !== $candidature->offre->user_id) {
-        return redirect()->back()->with('error', 'Vous n\'êtes pas autorisé à télécharger ce CV.');
+    {
+        // Vérification des permissions (recruteur de l'offre ou candidat propriétaire)
+        if (Auth::id() !== $candidature->user_id && Auth::id() !== $candidature->offre->user_id && !Auth::user()->isAdmin()) {
+            return redirect()->back()->with('error', 'Vous n\'êtes pas autorisé à télécharger ce CV.');
+        }
+        
+        if (!$candidature->cv) {
+            return redirect()->back()->with('error', 'Aucun CV disponible pour cette candidature.');
+        }
+        
+        // Chemin du fichier dans storage/app/public
+        $path = storage_path('app/public/' . $candidature->cv);
+        
+        // Vérifier si le fichier existe
+        if (!file_exists($path)) {
+            // Essayer avec le chemin direct sans public
+            $path = storage_path('app/' . $candidature->cv);
+            
+            if (!file_exists($path)) {
+                return redirect()->back()->with('error', 'Le fichier CV n\'a pas été trouvé.');
+            }
+        }
+        
+        // Extraire l'extension du fichier
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        
+        // Générer un nom de fichier compréhensible
+        $filename = 'CV_' . $candidature->user->name . '_' . date('Ymd') . '.' . $extension;
+        
+        // Définir les headers pour le téléchargement
+        $headers = [
+            'Content-Type' => $extension == 'pdf' ? 'application/pdf' : 'application/octet-stream',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+        
+        // Retourner le fichier en téléchargement
+        return response()->download($path, $filename, $headers);
     }
-    
-    if (!$candidature->cv) {
-        return redirect()->back()->with('error', 'Aucun CV disponible pour cette candidature.');
-    }
-    
-    $path = storage_path('app/public/' . $candidature->cv);
-    
-    if (!file_exists($path)) {
-        return redirect()->back()->with('error', 'Le fichier CV n\'a pas été trouvé.');
-    }
-    
-    return response()->download($path, 'CV_' . $candidature->user->name . '.pdf');
-}
 }

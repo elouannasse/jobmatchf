@@ -56,7 +56,7 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     
-                                    <form id="delete-form-{{ $user->id }}" action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-inline" data-user-name="{{ $user->name }}">
+                                    <form id="delete-form-{{ $user->id }}" action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-inline" data-user-name="{{ $user->name }}" data-user-id="{{ $user->id }}">
                                         @csrf
                                         @method('DELETE')
                                         <button type="button" class="btn btn-sm btn-outline-danger delete-btn">
@@ -90,19 +90,27 @@
 @endpush
 
 @push('scripts')
-<script src="{{ asset('js/delete-modal.js') }}"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const deleteButtons = document.querySelectorAll('.delete-btn');
-
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                const form = this.closest('form');
-                const userName = form.getAttribute('data-user-name');
-
-                if (confirm(`Êtes-vous sûr de vouloir supprimer l'utilisateur ${userName} ?`)) {
-                    form.submit();
-                }
+    $(document).ready(function() {
+        // Direct implementation for user deletion
+        $('.delete-btn').on('click', function(e) {
+            e.preventDefault();
+            
+            // Get the form
+            const form = $(this).closest('form');
+            const userName = form.data('user-name');
+            
+            // Update modal content
+            $('#confirmationMessage').text('Êtes-vous sûr de vouloir supprimer l\'utilisateur ' + userName + ' ?');
+            
+            // Show modal
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            deleteModal.show();
+            
+            // When confirm button is clicked
+            $('#confirmDelete').off('click').on('click', function() {
+                form.submit();
+                deleteModal.hide();
             });
         });
     });
