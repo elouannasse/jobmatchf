@@ -1,0 +1,159 @@
+/* Custom styles for offres pages */
+.offre-form label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.offre-form input[type="text"],
+.offre-form input[type="number"],
+.offre-form input[type="date"],
+.offre-form select,
+.offre-form textarea {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.offre-form input[type="text"]:focus,
+.offre-form input[type="number"]:focus,
+.offre-form input[type="date"]:focus,
+.offre-form select:focus,
+.offre-form textarea:focus {
+  color: #495057;
+  background-color: #fff;
+  border-color: #4e73df;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+.offre-form .form-text {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.card-dashboard {
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+  border: none;
+  border-radius: 0.35rem;
+}
+
+.card-dashboard .card-header {
+  background-color: #f8f9fc;
+  border-bottom: 1px solid #e3e6f0;
+  padding: 0.75rem 1.25rem;
+}
+
+.card-dashboard .card-header .font-weight-bold {
+  color: #4e73df;
+}
+
+.card-dashboard .card-body {
+  padding: 1.25rem;
+}
+
+.text-primary {
+  color: #4e73df !important;
+}
+
+.bg-danger.text-white {
+  background-color: #e74a3b !important;
+  color: white !important;
+}
+
+/* Fix for form controls */
+.form-control, .form-select {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #4e73df;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+}
+
+/* Fix for buttons */
+.btn {
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  user-select: none;
+  border: 1px solid transparent;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 0.25rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #4e73df;
+  border-color: #4e73df;
+}
+
+.btn-primary:hover {
+  color: #fff;
+  background-color: #2e59d9;
+  border-color: #2653d4;
+}
+
+.btn-secondary {
+  color: #fff;
+  background-color: #858796;
+  border-color: #858796;
+}
+
+.btn-secondary:hover {
+  color: #fff;
+  background-color: #717384;
+  border-color: #6b6d7d;
+}
+
+.btn-danger {
+  color: #fff;
+  background-color: #e74a3b;
+  border-color: #e74a3b;
+}
+
+.btn-danger:hover {
+  color: #fff;
+  background-color: #e02d1b;
+  border-color: #d52a1a;
+}
+
+.btn-outline-secondary {
+  color: #858796;
+  background-color: transparent;
+  border-color: #858796;
+}
+
+.btn-outline-secondary:hover {
+  color: #fff;
+  background-color: #858796;
+  border-color: #858796;
+}
