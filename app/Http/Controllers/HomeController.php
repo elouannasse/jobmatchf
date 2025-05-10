@@ -9,9 +9,7 @@ use App\Models\Candidature;
 
 class HomeController extends Controller
 {
-    /**
-     * Affiche la page d'accueil en fonction du rôle de l'utilisateur
-     */
+   
     public function index()
     {
         $user = auth()->user();
@@ -25,9 +23,7 @@ class HomeController extends Controller
         }
     }
 
-    /**
-     * Affiche le tableau de bord de l'administrateur
-     */
+   
     public function adminDashboard()
     {
         $stats = [
@@ -42,13 +38,11 @@ class HomeController extends Controller
             'total_candidatures' => Candidature::count(),
         ];
 
-        // Ajout des dernières offres
         $latestOffers = Offre::with('user')
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
         
-        // Données pour les graphiques
         $monthlyRegistrations = [];
         $monthLabels = [];
         
@@ -64,9 +58,7 @@ class HomeController extends Controller
         return view('admin.dashboard', compact('stats', 'latestOffers', 'monthlyRegistrations', 'monthLabels'));
     }
 
-    /**
-     * Affiche le tableau de bord du recruteur
-     */
+    
     private function recruteurDashboard()
     {
         $user = auth()->user();
@@ -86,9 +78,7 @@ class HomeController extends Controller
         return view('home', compact('totalOffres', 'offresActives', 'totalCandidatures', 'recentOffres', 'recentCandidatures'));
     }
 
-    /**
-     * Affiche le tableau de bord du candidat
-     */
+    
     private function candidatDashboard()
     {
         $user = auth()->user();
@@ -100,10 +90,9 @@ class HomeController extends Controller
             'candidatures_refusees' => $user->candidatures()->where('statut', 'refusee')->count(),
         ];
         
-        // Offres actives et approuvées uniquement
         $offres_recentes = Offre::where('etat', true)
-            ->where('approved', true)  // Afficher uniquement les offres approuvées
-            ->with('user')             // Inclure les informations du recruteur
+            ->where('approved', true)  
+            ->with('user')             
             ->latest()
             ->take(5)
             ->get();

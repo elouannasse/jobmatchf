@@ -15,26 +15,20 @@ class OffreStatusNotification extends Notification
     protected $offre;
     protected $isApproved;
 
-    /**
-     * Create a new notification instance.
-     */
+    
     public function __construct(Offre $offre, bool $isApproved)
     {
         $this->offre = $offre;
         $this->isApproved = $isApproved;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     */
+    
     public function via(object $notifiable): array
     {
-        return ['database', 'mail']; // Vous pouvez choisir database, mail, ou les deux
+        return ['database', 'mail']; 
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
+    
     public function toMail(object $notifiable): MailMessage
     {
         if ($this->isApproved) {
@@ -53,9 +47,7 @@ class OffreStatusNotification extends Notification
         }
     }
 
-    /**
-     * Get the array representation of the notification.
-     */
+    
     public function toArray(object $notifiable): array
     {
         return [

@@ -61,7 +61,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         // Vérifie si l'utilisateur possède un rôle nommé 'Administrateur'
         return Cache::rememberForever("user_{$this->id}_is_administrator", function () {
-            return $this->role()->where('name', self::ROLE_ADMINISTRATEUR)->exists();
+            return $this->role()->where('name', self::ROLE_ADMINISTRATEUR)->exists(); 
         });
     }
 
@@ -116,27 +116,27 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Les langues parlées par cet utilisateur.
      */
-    public function langues(): BelongsToMany
-    {
-        return $this->belongsToMany(Langue::class, 'candidat_langue')
-            ->withPivot('niveau');
-    }
+    // public function langues(): BelongsToMany
+    // {
+    //     return $this->belongsToMany(Langue::class, 'candidat_langue')
+    //         ->withPivot('niveau');
+    // }
 
-    /**
-     * Les competences de cet utilisateur.
-     */
-    public function competences(): BelongsToMany
-    {
-        return $this->belongsToMany(Competence::class, 'candidat_competence');
-    }
+    // /**
+    //  * Les competences de cet utilisateur.
+    //  */
+    // public function competences(): BelongsToMany
+    // {
+    //     return $this->belongsToMany(Competence::class, 'candidat_competence');
+    // }
 
-    /**
-     * Les experiences de cet utilisateur.
-     */
-    public function experiences(): HasMany
-    {
-        return $this->hasMany(Experience::class);
-    }
+    // /**
+    //  * Les experiences de cet utilisateur.
+    //  */
+    // public function experiences(): HasMany
+    // {
+    //     return $this->hasMany(Experience::class);
+    // }
 
     /**
      * Les formations de cet utilisateur.

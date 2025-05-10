@@ -8,23 +8,20 @@ use App\Models\TypeEntreprise;
 
 class ProfileController extends Controller
 {
-    /**
-     */
+    
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    /**
-     */
+    
     public function show()
     {
         $user = Auth::user();
         return view('profile.show', compact('user'));
     }
 
-    /**
-     */
+   
     public function edit()
     {
         $user = Auth::user();
@@ -33,8 +30,6 @@ class ProfileController extends Controller
         return view('profile.edit', compact('user', 'typesEntreprise'));
     }
 
-    /**
-     */
     public function update(Request $request)
     {
         $user = Auth::user();
@@ -68,6 +63,6 @@ class ProfileController extends Controller
         $user->save();
         
         return redirect()->route('profile.show')
-            ->with('success', 'تم تحديث ملفك الشخصي بنجاح.');
+            ->with('success', 'succe');
     }
 }

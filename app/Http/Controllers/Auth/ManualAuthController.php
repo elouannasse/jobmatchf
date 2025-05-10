@@ -12,16 +12,13 @@ use Illuminate\Support\Facades\Hash;
 
 class ManualAuthController extends Controller
 {
-    /**
-     *    
-     */
+   
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
-    /**
-     */
+   
     public function login(Request $request)
     {
         $request->validate([
@@ -29,31 +26,26 @@ class ManualAuthController extends Controller
             'password' => 'required',
         ]);
         
-        // Chercher l'utilisateur manuellement
         $user = User::where('email', $request->email)->first();
         
-        // Si l'utilisateur n'existe pas
         if (!$user) {
             return back()->withErrors([
                 'email' => 'Utilisateur introuvable avec cet email.',
             ]);
         }
         
-        // Vérifier le mot de passe manuellement
         if (!Hash::check($request->password, $user->password)) {
             return back()->withErrors([
                 'email' => 'Mot de passe incorrect.',
             ]);
         }
         
-        // Si tout est bon, connecter l'utilisateur manuellement
         Auth::login($user);
         $request->session()->regenerate();
         
         return redirect()->route('home');
     }
-    /**
-     */
+    
     public function showRegisterForm()
     {
         $roles = Role::whereIn('name', [
@@ -66,8 +58,7 @@ class ManualAuthController extends Controller
         return view('auth.register', compact('roles', 'typesEntreprise'));
     }
 
-    /**
-     */
+    
     public function register(Request $request)
     {
         $request->validate([
@@ -94,8 +85,7 @@ class ManualAuthController extends Controller
         return redirect()->route('home');
     }
 
-    /**
-     */
+    
     public function logout(Request $request)
     {
         Auth::logout();

@@ -34,13 +34,9 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(MessageRepositoryInterface::class, MessageRepository::class);
     }
 
-    /**
-     * Bootstrap services.
-     *
-     * @return void
-     */
+   
     public function boot()
     {
-        //
+        
     }
 }

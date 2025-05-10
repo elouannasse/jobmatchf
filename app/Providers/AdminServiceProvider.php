@@ -12,11 +12,7 @@ use Illuminate\Support\ServiceProvider;
 
 class AdminServiceProvider extends ServiceProvider
 {
-    /**
-     * Register services.
-     *
-     * @return void
-     */
+   
     public function register()
     {
         $this->app->singleton(AdminOffreService::class, function ($app) {
@@ -39,13 +35,9 @@ class AdminServiceProvider extends ServiceProvider
         });
     }
 
-    /**
-     * Bootstrap services.
-     *
-     * @return void
-     */
+   
     public function boot()
     {
-        //
+        
     }
 }

@@ -19,29 +19,16 @@ use App\Notifications\OffreStatusNotification;
 
 class AdminController extends Controller
 {
-    /**
-     * @var AdminOffreService
-     */
+    
     private $adminOffreService;
     
-    /**
-     * @var UserService
-     */
+    
     private $userService;
     
-    /**
-     * @var CandidatureService
-     */
+    
     private $candidatureService;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @param AdminOffreService $adminOffreService
-     * @param UserService $userService
-     * @param CandidatureService $candidatureService
-     * @return void
-     */
+    
     public function __construct(
         AdminOffreService $adminOffreService,
         UserService $userService,
@@ -51,17 +38,11 @@ class AdminController extends Controller
         $this->userService = $userService;
         $this->candidatureService = $candidatureService;
         $this->middleware('auth');
-        // $this->middleware('role:admin');
     }
 
-    /**
-     * Show the admin dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
+    
     public function index()
     {
-        // Get statistics
         $stats = [
             'total_utilisateurs' => User::count(),
             'total_recruteurs' => User::whereHas('role', function ($q) {
@@ -73,16 +54,12 @@ class AdminController extends Controller
             'total_offres' => Offre::count(),
         ];
 
-        // Get notifications
         $notifications = auth()->user()->unreadNotifications;
 
-        // Get pending offers
         $pendingOffers = Offre::where('etat', false)->latest()->take(5)->get();
 
-        // Get latest offers
         $latestOffers = Offre::with('user')->latest()->take(5)->get();
 
-        // Get monthly registration data for chart
         $year = Carbon::now()->year;
         $monthlyRegistrations = [];
         $monthLabels = [];
@@ -105,32 +82,20 @@ class AdminController extends Controller
         ));
     }
 
-    /**
-     * Show the admin dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
+    
     public function adminDashboard()
     {
         return $this->index();
     }
 
-    /**
-     * Show all users.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
+   
     public function users()
     {
         $users = $this->userService->getAllUsers(10);
         return view('admin.users', compact('users'));
     }
 
-    /**
-     * Show all recruiters.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
+   
     public function recruteurs()
     {
         $recruteurs = User::whereHas('role', function ($q) {
@@ -140,11 +105,7 @@ class AdminController extends Controller
         return view('admin.recruteurs', compact('recruteurs'));
     }
 
-    /**
-     * Show all candidates.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
+   
     public function candidats()
     {
         $candidats = User::whereHas('role', function ($q) {
@@ -154,15 +115,9 @@ class AdminController extends Controller
         return view('admin.candidats', compact('candidats'));
     }
 
-    /**
-     * Show all job offers with statistics.
-     *
-     * @param Request $request
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
+   
     public function offres(Request $request)
     {
-        // Get the filters from the request
         $filters = [];
         
         if ($request->has('etat')) {
@@ -177,10 +132,8 @@ class AdminController extends Controller
             $filters['pending'] = true;
         }
         
-        // Get paginated job offers with filters
         $offres = $this->adminOffreService->getAllOffers($filters, 10);
         
-        // Get statistics for charts
         $stats = $this->adminOffreService->getOfferStatistics();
         
         return view('admin.offres', [
@@ -192,35 +145,21 @@ class AdminController extends Controller
         ]);
     }
 
-    /**
-     * Show pending job offers.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
+   
     public function showPendingOffers()
     {
         $offres = $this->adminOffreService->getPendingOffers(10);
         return view('admin.offres-pending', compact('offres'));
     }
 
-    /**
-     * Show job offer details.
-     *
-     * @param Offre $offre
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
+   
     public function showOffer(Offre $offre)
     {
         $offre->load('user', 'candidatures.user');
         return view('admin.offre-details', compact('offre'));
     }
 
-    /**
-     * Approve a job offer.
-     *
-     * @param int $offreId
-     * @return \Illuminate\Http\RedirectResponse
-     */
+   
     public function approveOffre(int $offreId)
     {
         $result = $this->adminOffreService->approveOffer($offreId);
@@ -232,13 +171,7 @@ class AdminController extends Controller
         return redirect()->back()->with('error', 'Un problème est survenu lors de l\'approbation de l\'offre.');
     }
 
-    /**
-     * Reject a job offer.
-     *
-     * @param Request $request
-     * @param int $offreId
-     * @return \Illuminate\Http\RedirectResponse
-     */
+    
     public function rejectOffre(Request $request, int $offreId)
     {
         $result = $this->adminOffreService->rejectOffer($offreId);
@@ -250,16 +183,10 @@ class AdminController extends Controller
         return redirect()->back()->with('error', 'Un problème est survenu lors du rejet de l\'offre.');
     }
 
-    /**
-     * Toggle the status of an offer.
-     * 
-     * @param int $offreId
-     * @return \Illuminate\Http\RedirectResponse
-     */
+    
     public function toggleOffreStatus(int $offreId)
     {
         $result = $this->adminOffreService->toggleOfferStatus($offreId);
-        // Get the updated offre to check its status
         $updatedOffre = Offre::find($offreId);
         
         if ($result) {
@@ -270,12 +197,7 @@ class AdminController extends Controller
         return redirect()->back()->with('error', 'Un problème est survenu lors de la modification du statut de l\'offre.');
     }
 
-    /**
-     * Change user status (active/inactive).
-     *
-     * @param User $user
-     * @return \Illuminate\Http\RedirectResponse
-     */
+   
     public function changeUserStatus(User $user)
     {
         $user->is_active = !$user->is_active;
@@ -285,14 +207,9 @@ class AdminController extends Controller
         return redirect()->back()->with('success', "L'utilisateur a été {$status} avec succès.");
     }
 
-    /**
-     * Show admin reports and statistics.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
+   
     public function statistics()
     {
-        // User registrations per month
         $userRegistrations = User::select(
             DB::raw('YEAR(created_at) as year'),
             DB::raw('MONTH(created_at) as month'),
@@ -304,7 +221,6 @@ class AdminController extends Controller
             ->take(12)
             ->get();
 
-        // Offers per month
         $offerStatistics = Offre::select(
             DB::raw('YEAR(created_at) as year'),
             DB::raw('MONTH(created_at) as month'),
@@ -316,7 +232,6 @@ class AdminController extends Controller
             ->take(12)
             ->get();
 
-        // Applications per month
         $applicationStatistics = Candidature::select(
             DB::raw('YEAR(created_at) as year'),
             DB::raw('MONTH(created_at) as month'),
@@ -328,13 +243,11 @@ class AdminController extends Controller
             ->take(12)
             ->get();
 
-        // Popular job types
         $popularJobTypes = Offre::select('type_contrat', DB::raw('count(*) as total'))
             ->groupBy('type_contrat')
             ->orderBy('total', 'desc')
             ->get();
 
-        // Popular locations
         $popularLocations = Offre::select('lieu', DB::raw('count(*) as total'))
             ->groupBy('lieu')
             ->orderBy('total', 'desc')
@@ -350,33 +263,25 @@ class AdminController extends Controller
         ));
     }
 
-    /**
-     * Show and manage candidatures.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
+   
     public function candidatures()
     {
         $candidatures = $this->candidatureService->getAllCandidatures(10);
 
-        // Ajouter le comptage des candidatures par statut
         $enAttente = Candidature::where('statut', 'en_attente')->count();
         $acceptees = Candidature::where('statut', 'acceptee')->count();
         $refusees = Candidature::where('statut', 'refusee')->count();
         $totalCandidatures = Candidature::count();
 
-        // Top des offres avec le plus de candidatures
         $topOffres = Offre::withCount('candidatures')
             ->orderBy('candidatures_count', 'desc')
             ->take(5)
             ->get();
 
-        // Récupérer les titres et le nombre de candidatures pour chaque offre
         $topOffresTitres = $topOffres->pluck('titre')->toArray();
         $topOffresCount = $topOffres->pluck('candidatures_count')->toArray();
-        $topOffresTotaux = $totalCandidatures; // Total de toutes les candidatures
+        $topOffresTotaux = $totalCandidatures; 
 
-        // Statistiques de candidatures par mois
         $candidaturesByMonth = Candidature::select(
             DB::raw('YEAR(created_at) as year'),
             DB::raw('MONTH(created_at) as month'),
@@ -397,7 +302,6 @@ class AdminController extends Controller
             $candidatureMonthlyData[] = $entry->total;
         }
 
-        // Ajout des statistiques mensuelles
         $monthlyStats = $candidatureMonthlyData;
 
         return view('admin.candidatures', compact(
@@ -415,37 +319,22 @@ class AdminController extends Controller
         ));
     }
 
-    /**
-     * Delete a user.
-     *
-     * @param User $user
-     * @return \Illuminate\Http\RedirectResponse
-     */
+   
     public function deleteUser(User $user)
     {
-        // Delete the user
         $user->delete();
 
         return redirect()->route('admin.users')->with('success', 'L\'utilisateur a été supprimé avec succès.');
     }
 
-    /**
-     * Create a new user form.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
+   
     public function createUser()
     {
         $roles =Role::all();
         return view('admin.create-user', compact('roles'));
     }
 
-    /**
-     * Store a new user in the database.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
+   
     public function storeUser(Request $request)
     {
         $request->validate([
@@ -467,25 +356,14 @@ class AdminController extends Controller
             ->withInput();
     }
 
-    /**
-     * Edit a user form.
-     *
-     * @param User $user
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
+   
     public function editUser(User $user)
     {
         $roles = Role::all();
         return view('admin.users.edit', compact('user', 'roles'));
     }
 
-    /**
-     * Update a user.
-     *
-     * @param Request $request
-     * @param User $user
-     * @return \Illuminate\Http\RedirectResponse
-     */
+   
     public function updateUser(Request $request, User $user)
     {
         $request->validate([
@@ -497,7 +375,7 @@ class AdminController extends Controller
         $userData = [
             'name' => $request->name,
             'email' => $request->email,
-            'role_id' => $request->role_id, // Directly assign role_id
+            'role_id' => $request->role_id, 
         ];
 
         if ($request->filled('prenom')) {
@@ -520,12 +398,7 @@ class AdminController extends Controller
             ->with('success', 'Utilisateur modifié avec succès');
     }
 
-    /**
-     * Delete a user.
-     *
-     * @param int $userId
-     * @return \Illuminate\Http\RedirectResponse
-     */
+   
     public function destroyUser(int $userId)
     {
         $result = $this->userService->deleteUser($userId);
@@ -539,12 +412,7 @@ class AdminController extends Controller
             ->with('error', 'Erreur lors de la suppression de l\'utilisateur');
     }
 
-    /**
-     * Delete a candidature.
-     *
-     * @param int $candidatureId
-     * @return \Illuminate\Http\RedirectResponse
-     */
+   
     public function deleteCandidature(int $candidatureId)
     {
         $result = $this->candidatureService->deleteCandidature($candidatureId);
@@ -558,22 +426,13 @@ class AdminController extends Controller
             ->with('error', 'Une erreur est survenue lors de la suppression de la candidature.');
     }
 
-    /**
-     * Show the form to create a new candidate.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
+   
     public function createCandidate()
     {
         return view('admin.create-candidate');
     }
 
-    /**
-     * Store a new candidate in the database.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
+   
     public function storeCandidate(Request $request)
     {
         $request->validate([

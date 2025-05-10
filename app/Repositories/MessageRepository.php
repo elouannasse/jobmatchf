@@ -9,19 +9,13 @@ use Illuminate\Support\Facades\DB;
 
 class MessageRepository extends BaseRepository implements MessageRepositoryInterface
 {
-    /**
-     * MessageRepository constructor.
-     * 
-     * @param Message $model
-     */
+    
     public function __construct(Message $model)
     {
         parent::__construct($model);
     }
 
-    /**
-     * @inheritdoc
-     */
+    
     public function getMessagesBetweenUsers(int $senderId, int $receiverId): Collection
     {
         return $this->model
@@ -37,9 +31,7 @@ class MessageRepository extends BaseRepository implements MessageRepositoryInter
             ->get();
     }
 
-    /**
-     * @inheritdoc
-     */
+    
     public function getConversationsForUser(int $userId): Collection
     {
         $userIds = DB::table('messages')
@@ -57,9 +49,7 @@ class MessageRepository extends BaseRepository implements MessageRepositoryInter
         return \App\Models\User::whereIn('id', $userIds)->get();
     }
 
-    /**
-     * @inheritdoc
-     */
+   
     public function markAsRead(int $receiverId, int $senderId): bool
     {
         return $this->model

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Job Match') }}</title>
+    <title>Job Match</title>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
@@ -25,7 +25,7 @@
         <nav class="navbar navbar-expand-md navbar-dark bg-primary shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Job Match') }}
+                Job Match
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
@@ -115,7 +115,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6">
-                        <h5>{{ config('app.name', 'Job Match') }}</h5>
+                        <h5>Job Match</h5>
                         <p>Trouvez l'emploi qui vous correspond ou le candidat idéal pour votre entreprise.</p>
                     </div>
                     <div class="col-md-3">

@@ -14,25 +14,19 @@ class PendingOfferNotification extends Notification
 
     protected $offre;
 
-    /**
-     * Create a new notification instance.
-     */
+  
     public function __construct(Offre $offre)
     {
         $this->offre = $offre;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     */
+  
     public function via(object $notifiable): array
     {
         return ['database', 'mail'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
+  
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
@@ -44,9 +38,7 @@ class PendingOfferNotification extends Notification
             ->line('Merci d\'utiliser notre plateforme!');
     }
 
-    /**
-     * Get the array representation of the notification.
-     */
+  
     public function toArray(object $notifiable): array
     {
         return [

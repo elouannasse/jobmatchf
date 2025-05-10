@@ -59,7 +59,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/users/{user}/edit', [AdminController::class, 'editUser'])->name('users.edit');
         Route::put('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
         
-        // Correction: utiliser un seul nom de route pour la suppression d'utilisateur
         Route::delete('/users/{userId}', [AdminController::class, 'destroyUser'])->name('users.destroy');
         
         Route::get('/statistics', [AdminController::class, 'statistics'])->name('statistics');
@@ -71,7 +70,6 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/offres/{offreId}/reject', [AdminController::class, 'rejectOffre'])->name('offres.reject');
         Route::put('/offres/{offreId}/toggle-status', [AdminController::class, 'toggleOffreStatus'])->name('offres.toggle-status');
         
-        // Modifié pour utiliser la méthode existante deleteCandidature au lieu de destroyCandidature
         Route::delete('/candidatures/{candidatureId}', [AdminController::class, 'deleteCandidature'])->name('candidatures.destroy');
         
         Route::get('/candidats/create', [AdminController::class, 'createCandidate'])->name('candidats.create');

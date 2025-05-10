@@ -7,9 +7,7 @@ use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
-    /**
-     * Display a listing of all notifications.
-     */
+    
     public function index()
     {
         $user = Auth::user();
@@ -18,9 +16,7 @@ class NotificationController extends Controller
         return view('notifications.index', compact('notifications'));
     }
 
-    /**
-     * Mark a specific notification as read.
-     */
+    
     public function markAsRead($id)
     {
         $notification = Auth::user()->notifications()->findOrFail($id);
@@ -29,9 +25,7 @@ class NotificationController extends Controller
         return redirect()->back()->with('success', 'Notification marquée comme lue');
     }
 
-    /**
-     * Mark all notifications as read.
-     */
+   
     public function markAllAsRead()
     {
         Auth::user()->unreadNotifications->markAsRead();
@@ -39,11 +33,7 @@ class NotificationController extends Controller
         return redirect()->back()->with('success', 'Toutes les notifications ont été marquées comme lues');
     }
 
-    /**
-     * Get the count of unread notifications.
-     * 
-     * @return \Illuminate\Http\JsonResponse
-     */
+   
     public function getCount()
     {
         return response()->json([
@@ -51,11 +41,7 @@ class NotificationController extends Controller
         ]);
     }
 
-    /**
-     * Get notification dropdown content for AJAX requests.
-     * 
-     * @return \Illuminate\Http\JsonResponse
-     */
+    
     public function getDropdownContent()
     {
         if (!auth()->user()) {

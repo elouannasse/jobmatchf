@@ -9,13 +9,7 @@ use App\Models\Role;
 
 class RoleMiddleware
 {
-    /**
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  string  $role
-     * @return mixed
-     */
+    
     public function handle(Request $request, Closure $next, string $role)
     {
         if (!$request->user() || !$this->checkRole($request->user(), $role)) {
@@ -25,12 +19,7 @@ class RoleMiddleware
         return $next($request);
     }
 
-    /**
-     * 
-     * @param  \App\Models\User  $user
-     * @param  string  $role
-     * @return bool
-     */
+    
     private function checkRole($user, $role): bool
     {
         switch ($role) {
